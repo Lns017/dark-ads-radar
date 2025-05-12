@@ -8,7 +8,9 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import Auth from "./pages/Auth";
+import EmailVerification from "./pages/EmailVerification";
 import Pixels from "./pages/Pixels";
+import PixelDetail from "./pages/PixelDetail";
 import Campaigns from "./pages/Campaigns";
 import ProtectedRoute from "@/components/ProtectedRoute";
 
@@ -23,6 +25,7 @@ const App = () => (
         <AuthProvider>
           <Routes>
             <Route path="/auth" element={<Auth />} />
+            <Route path="/verify" element={<EmailVerification />} />
             <Route 
               path="/" 
               element={
@@ -36,6 +39,14 @@ const App = () => (
               element={
                 <ProtectedRoute>
                   <Pixels />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/pixel/:pixelId" 
+              element={
+                <ProtectedRoute>
+                  <PixelDetail />
                 </ProtectedRoute>
               } 
             />

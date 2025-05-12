@@ -1,6 +1,6 @@
 
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -20,6 +20,7 @@ type AuthFormValues = z.infer<typeof authSchema>;
 
 const Auth = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [isLoading, setIsLoading] = useState(false);
   const [authMode, setAuthMode] = useState<'login' | 'signup'>('login');
   
@@ -36,7 +37,7 @@ const Auth = () => {
     
     try {
       if (authMode === 'login') {
-        const { error } = await supabase.auth.signInWithPassword({
+        const { error, data } = await supabase.auth.signInWithPassword({
           email: values.email,
           password: values.password,
         });
@@ -46,17 +47,27 @@ const Auth = () => {
         toast.success('Login realizado com sucesso!');
         navigate('/');
       } else {
-        const { error } = await supabase.auth.signUp({
+        // Sign up with OTP verification flow
+        const { error, data } = await supabase.auth.signUp({
           email: values.email,
           password: values.password,
           options: {
             emailRedirectTo: window.location.origin,
+            data: {
+              email_confirm_method: 'otp'
+            }
           },
         });
         
         if (error) throw error;
-        
-        toast.success('Conta criada com sucesso! Verifique seu email para confirmar.');
+
+        if (data.user?.identities?.length === 0) {
+          toast.error('Este email já está cadastrado. Por favor faça login.');
+        } else {
+          // Redirect to verification page
+          toast.success('Conta criada! Verifique seu email para o código de confirmação.');
+          navigate('/verify', { state: { email: values.email } });
+        }
       }
     } catch (error: any) {
       console.error('Erro de autenticação:', error);

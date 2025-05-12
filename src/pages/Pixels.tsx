@@ -4,6 +4,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
+import { useNavigate } from 'react-router-dom';
 import Header from '@/components/dashboard/Header';
 import Sidebar from '@/components/dashboard/Sidebar';
 import { Button } from '@/components/ui/button';
@@ -44,7 +45,8 @@ import {
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Edit, Trash2, Plus, Facebook, BarChart3 } from 'lucide-react';
+import { Edit, Trash2, Plus, Facebook, BarChart3, Eye } from 'lucide-react';
+import LoadingSpinner from '@/components/ui/loading-spinner';
 
 // Define schema for creating a new pixel
 const pixelSchema = z.object({
@@ -70,6 +72,7 @@ interface Pixel {
 }
 
 const Pixels = () => {
+  const navigate = useNavigate();
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
@@ -240,6 +243,11 @@ const Pixels = () => {
     }
   };
 
+  // Handle viewing pixel details
+  const handleViewDetails = (pixelId: string) => {
+    navigate(`/pixel/${pixelId}`);
+  };
+
   return (
     <div className="flex min-h-screen bg-background">
       <Sidebar collapsed={sidebarCollapsed} setCollapsed={setSidebarCollapsed} />
@@ -346,8 +354,7 @@ const Pixels = () => {
           <div className="rounded-lg border bg-card">
             {isLoading ? (
               <div className="py-10 text-center">
-                <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent mx-auto"></div>
-                <p className="mt-2 text-muted-foreground">Carregando pixels...</p>
+                <LoadingSpinner />
               </div>
             ) : pixels && pixels.length > 0 ? (
               <div className="overflow-x-auto">
@@ -363,7 +370,7 @@ const Pixels = () => {
                   </TableHeader>
                   <TableBody>
                     {pixels.map((pixel) => (
-                      <TableRow key={pixel.id}>
+                      <TableRow key={pixel.id} className="cursor-pointer" onClick={() => handleViewDetails(pixel.id)}>
                         <TableCell className="font-medium">{pixel.nome_pixel}</TableCell>
                         <TableCell>
                           {pixel.plataforma === 'facebook' ? (
@@ -386,8 +393,15 @@ const Pixels = () => {
                         <TableCell>
                           {new Date(pixel.criado_em).toLocaleDateString('pt-BR')}
                         </TableCell>
-                        <TableCell>
+                        <TableCell onClick={(e) => e.stopPropagation()}>
                           <div className="flex gap-2">
+                            <Button 
+                              variant="outline" 
+                              size="icon" 
+                              onClick={() => handleViewDetails(pixel.id)}
+                            >
+                              <Eye size={16} />
+                            </Button>
                             <Button 
                               variant="outline" 
                               size="icon" 

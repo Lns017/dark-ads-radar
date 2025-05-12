@@ -121,10 +121,13 @@ const Pixels = () => {
     mutationFn: async (values: PixelFormValues) => {
       const { data, error } = await supabase
         .from('pixels')
-        .insert([{
-          ...values,
+        .insert({
+          nome_pixel: values.nome_pixel,
+          plataforma: values.plataforma,
+          status: values.status,
           user_id: user!.id,
-        }])
+          eventos_capturados: values.eventos_capturados
+        })
         .select();
       
       if (error) {
@@ -149,7 +152,12 @@ const Pixels = () => {
     mutationFn: async ({ id, values }: { id: string, values: PixelFormValues }) => {
       const { data, error } = await supabase
         .from('pixels')
-        .update(values)
+        .update({
+          nome_pixel: values.nome_pixel,
+          plataforma: values.plataforma,
+          status: values.status,
+          eventos_capturados: values.eventos_capturados
+        })
         .eq('id', id)
         .select();
       

@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -157,10 +156,13 @@ const Campaigns = () => {
 
       const { data, error } = await supabase
         .from('campanhas')
-        .insert([{
-          ...values,
-          custo_por_conversao,
-        }])
+        .insert({
+          nome_campanha: values.nome_campanha,
+          pixel_id: values.pixel_id,
+          investimento: values.investimento,
+          conversoes: values.conversoes,
+          custo_por_conversao
+        })
         .select();
       
       if (error) {
@@ -191,8 +193,11 @@ const Campaigns = () => {
       const { data, error } = await supabase
         .from('campanhas')
         .update({
-          ...values,
-          custo_por_conversao,
+          nome_campanha: values.nome_campanha,
+          pixel_id: values.pixel_id,
+          investimento: values.investimento,
+          conversoes: values.conversoes,
+          custo_por_conversao
         })
         .eq('id', id)
         .select();

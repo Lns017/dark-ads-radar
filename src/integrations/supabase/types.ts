@@ -9,7 +9,74 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      campanhas: {
+        Row: {
+          conversoes: number | null
+          custo_por_conversao: number | null
+          data: string | null
+          id: string
+          investimento: number | null
+          nome_campanha: string
+          pixel_id: string
+        }
+        Insert: {
+          conversoes?: number | null
+          custo_por_conversao?: number | null
+          data?: string | null
+          id?: string
+          investimento?: number | null
+          nome_campanha: string
+          pixel_id: string
+        }
+        Update: {
+          conversoes?: number | null
+          custo_por_conversao?: number | null
+          data?: string | null
+          id?: string
+          investimento?: number | null
+          nome_campanha?: string
+          pixel_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "campanhas_pixel_id_fkey"
+            columns: ["pixel_id"]
+            isOneToOne: false
+            referencedRelation: "pixels"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pixels: {
+        Row: {
+          criado_em: string | null
+          eventos_capturados: Json | null
+          id: string
+          nome_pixel: string
+          plataforma: string
+          status: string
+          user_id: string
+        }
+        Insert: {
+          criado_em?: string | null
+          eventos_capturados?: Json | null
+          id?: string
+          nome_pixel: string
+          plataforma: string
+          status: string
+          user_id: string
+        }
+        Update: {
+          criado_em?: string | null
+          eventos_capturados?: Json | null
+          id?: string
+          nome_pixel?: string
+          plataforma?: string
+          status?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

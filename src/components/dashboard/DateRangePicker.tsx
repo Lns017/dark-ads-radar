@@ -12,19 +12,22 @@ import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { Calendar as CalendarComponent } from '@/components/ui/calendar';
 
-export function DateRangePicker() {
-  const [date, setDate] = useState<{
+interface DateRangePickerProps {
+  date: {
     from: Date;
-    to?: Date;
-  }>({
-    from: new Date(new Date().setDate(new Date().getDate() - 30)),
-    to: new Date(),
-  });
+    to: Date;
+  };
+  onDateChange: React.Dispatch<React.SetStateAction<{
+    from: Date;
+    to: Date;
+  }>>;
+}
 
+export function DateRangePicker({ date, onDateChange }: DateRangePickerProps) {
   const [isOpen, setIsOpen] = useState(false);
 
   const handleSelect = (selectedDate: any) => {
-    setDate(selectedDate);
+    onDateChange(selectedDate);
     if (selectedDate.to) {
       setIsOpen(false);
     }
@@ -72,7 +75,7 @@ export function DateRangePicker() {
             size="sm"
             onClick={() => {
               const today = new Date();
-              setDate({
+              onDateChange({
                 from: new Date(today.setDate(today.getDate() - 7)),
                 to: new Date(),
               });
@@ -86,7 +89,7 @@ export function DateRangePicker() {
             size="sm"
             onClick={() => {
               const today = new Date();
-              setDate({
+              onDateChange({
                 from: new Date(today.setDate(today.getDate() - 30)),
                 to: new Date(),
               });

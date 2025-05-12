@@ -16,12 +16,12 @@ import {
 } from 'recharts';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
-interface PerformanceData {
+export interface PerformanceData {
   date: string;
   investment: number;
   conversions: number;
-  cpc: number;
-  ctr: number;
+  cpc: number | string; // Updated to accept string or number
+  ctr: number | string; // Updated to accept string or number
   impressions: number;
 }
 

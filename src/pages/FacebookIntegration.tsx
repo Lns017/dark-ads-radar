@@ -20,32 +20,9 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import { FacebookIntegration, AdAccount, SyncProgress } from '@/types/facebook';
 
-interface FacebookIntegration {
-  id: string;
-  user_id: string;
-  facebook_user_id: string;
-  facebook_user_name: string;
-  facebook_user_email: string;
-  connected_at: string;
-  is_active: boolean;
-  ad_accounts: AdAccount[];
-}
-
-interface AdAccount {
-  id: string;
-  name: string;
-  account_id: string;
-  business_name: string;
-}
-
-interface SyncProgress {
-  accountId: string;
-  status: 'idle' | 'loading' | 'success' | 'error';
-  message?: string;
-}
-
-const FacebookIntegration = () => {
+const FacebookIntegrationPage = () => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [syncDialog, setSyncDialog] = useState<boolean>(false);
   const [selectedAccount, setSelectedAccount] = useState<AdAccount | null>(null);
@@ -75,10 +52,12 @@ const FacebookIntegration = () => {
   const { data: integrations, isLoading } = useQuery({
     queryKey: ['facebook-integrations'],
     queryFn: async () => {
+      if (!user) return [];
+      
       const { data, error } = await supabase
         .from('facebook_integrations')
         .select('*')
-        .eq('user_id', user?.id);
+        .eq('user_id', user.id);
       
       if (error) throw error;
       return data as FacebookIntegration[];
@@ -192,7 +171,7 @@ const FacebookIntegration = () => {
         setSyncProgress(prev => prev.filter(p => p.accountId !== accountId));
       }, 5000);
       
-    } catch (error) {
+    } catch (error: any) {
       console.error('Erro ao buscar dados:', error);
       setSyncProgress(prev => [
         ...prev.filter(p => p.accountId !== accountId),
@@ -387,4 +366,4 @@ const FacebookIntegration = () => {
   );
 };
 
-export default FacebookIntegration;
+export default FacebookIntegrationPage;

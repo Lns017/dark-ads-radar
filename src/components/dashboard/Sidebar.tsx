@@ -1,19 +1,25 @@
-
-import React from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import { cn } from '@/lib/utils';
-import { Button } from '@/components/ui/button';
+import React, { useState } from 'react';
 import { 
   BarChart3, 
+  Building2, 
+  Facebook,
   LayoutDashboard, 
-  Menu, 
-  ChevronLeft,
-  Code,
-  Settings,
-  LineChart,
-  Facebook
+  Settings, 
+  Tag, 
+  Users 
 } from 'lucide-react';
-import UserProfile from './UserProfile';
+import { Link, useLocation } from 'react-router-dom';
+import { useAuth } from '@/contexts/AuthContext';
+import { 
+  Sheet, 
+  SheetContent, 
+  SheetHeader, 
+  SheetTitle, 
+  SheetTrigger 
+} from '@/components/ui/sheet';
+import { Button } from '@/components/ui/button';
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 
 interface SidebarProps {
   collapsed: boolean;
@@ -22,92 +28,147 @@ interface SidebarProps {
 
 const Sidebar: React.FC<SidebarProps> = ({ collapsed, setCollapsed }) => {
   const location = useLocation();
-  
-  const navItems = [
+  const { user, signOut } = useAuth();
+  const [isSheetOpen, setIsSheetOpen] = useState(false);
+
+  const menuItems = [
     {
-      name: 'Dashboard',
-      path: '/',
-      icon: <LayoutDashboard size={20} />,
+      name: "Dashboard",
+      icon: <LayoutDashboard size={18} />,
+      href: "/",
     },
     {
-      name: 'Pixels',
-      path: '/pixels',
-      icon: <Code size={20} />,
+      name: "Pixels",
+      icon: <Tag size={18} />,
+      href: "/pixels",
     },
     {
-      name: 'Campanhas',
-      path: '/campaigns',
-      icon: <LineChart size={20} />,
+      name: "Campanhas",
+      icon: <BarChart3 size={18} />,
+      href: "/campaigns",
     },
     {
-      name: 'Facebook Ads',
-      path: '/facebook',
-      icon: <Facebook size={20} />,
+      name: "Facebook Ads",
+      icon: <Facebook size={18} />,
+      href: "/facebook-integration",
     },
     {
-      name: 'Google Ads',
-      path: '/google',
-      icon: <BarChart3 size={20} />,
+      name: "Clientes",
+      icon: <Users size={18} />,
+      href: "/customers",
     },
     {
-      name: 'Configurações',
-      path: '/settings',
-      icon: <Settings size={20} />,
+      name: "Empresa",
+      icon: <Building2 size={18} />,
+      href: "/company",
+    },
+    {
+      name: "Configurações",
+      icon: <Settings size={18} />,
+      href: "/settings",
     },
   ];
 
   return (
-    <div 
-      className={cn(
-        "fixed left-0 top-0 z-40 h-screen border-r border-border bg-background transition-all duration-300",
-        collapsed ? "w-16" : "w-64"
-      )}
-    >
-      <div className="flex h-16 items-center justify-between border-b border-border px-4">
-        <div className={cn("flex items-center", collapsed && "justify-center pl-2")}>
-          {!collapsed && (
-            <span className="text-xl font-bold">PixelTrack</span>
-          )}
-          {collapsed && (
-            <span className="text-xl font-bold">PT</span>
-          )}
+    <>
+      {/* Desktop Sidebar */}
+      <aside
+        className={`fixed left-0 top-0 z-50 flex h-full flex-col bg-secondary border-r border-r-border transition-all duration-300 ${
+          collapsed ? 'w-16' : 'w-64'
+        }`}
+      >
+        <div className="flex items-center justify-center py-3">
+          <Link to="/" className="flex items-center">
+            <span className="font-semibold text-xl">PixelTrack</span>
+          </Link>
         </div>
-        <button
-          onClick={() => setCollapsed(!collapsed)}
-          className="h-8 w-8 rounded-full flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted/30 transition-colors hidden lg:flex"
-        >
-          {collapsed ? <Menu size={16} /> : <ChevronLeft size={16} />}
-        </button>
-      </div>
 
-      <div className="py-4 flex flex-col h-[calc(100vh-4rem-1px)] justify-between">
-        <div>
-          <div className="px-3 pb-2">
-            {!collapsed && <p className="text-xs font-medium text-muted-foreground mb-1 ml-2">MENU</p>}
-          </div>
-          <nav className="grid gap-1 px-2">
-            {navItems.map((item) => (
-              <Link
-                key={item.path}
-                to={item.path}
-                className={cn(
-                  "flex items-center gap-2 rounded-md px-3 py-2 text-muted-foreground hover:text-foreground hover:bg-muted/30 transition-colors",
-                  location.pathname === item.path && "bg-muted/50 text-foreground",
-                  collapsed && "justify-center px-0"
-                )}
-              >
-                {item.icon}
-                {!collapsed && <span>{item.name}</span>}
-              </Link>
+        <nav className="flex-grow px-3 py-4">
+          <ul className="space-y-2">
+            {menuItems.map((item) => (
+              <li key={item.name}>
+                <Link
+                  to={item.href}
+                  className={`flex items-center space-x-3 rounded-md p-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground ${
+                    location.pathname === item.href ? 'bg-accent text-accent-foreground' : 'text-muted-foreground'
+                  }`}
+                >
+                  {item.icon}
+                  {!collapsed && <span>{item.name}</span>}
+                </Link>
+              </li>
             ))}
-          </nav>
-        </div>
+          </ul>
+        </nav>
         
-        <div className="mt-auto border-t border-border pt-2">
-          <UserProfile />
+        <div className="p-3">
+          {!collapsed && (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="flex h-8 w-full items-center justify-center rounded-md">
+                  <Avatar className="mr-2 h-8 w-8">
+                    <AvatarImage src={user?.user_metadata?.avatar_url} alt={user?.user_metadata?.full_name} />
+                    <AvatarFallback>{user?.email?.charAt(0).toUpperCase()}</AvatarFallback>
+                  </Avatar>
+                  <span>{user?.user_metadata?.full_name}</span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-40" align="end" forceMount>
+                <DropdownMenuItem>
+                  Meu Perfil
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={async () => {
+                  await signOut();
+                }}>
+                  Sair
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
         </div>
-      </div>
-    </div>
+      </aside>
+
+      {/* Mobile Bottom Sheet */}
+      <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
+        <SheetTrigger asChild>
+          <Button variant="ghost" size="icon" className="absolute left-4 top-4 md:hidden">
+            <LayoutDashboard size={20} />
+          </Button>
+        </SheetTrigger>
+        <SheetContent side="left" className="w-64">
+          <SheetHeader className="text-left">
+            <SheetTitle>Menu</SheetTitle>
+          </SheetHeader>
+          <nav className="flex-grow px-3 py-4">
+            <ul className="space-y-2">
+              {menuItems.map((item) => (
+                <li key={item.name}>
+                  <Link
+                    to={item.href}
+                    className={`flex items-center space-x-3 rounded-md p-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground ${
+                      location.pathname === item.href ? 'bg-accent text-accent-foreground' : 'text-muted-foreground'
+                    }`}
+                    onClick={() => setIsSheetOpen(false)}
+                  >
+                    {item.icon}
+                    <span>{item.name}</span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </nav>
+          <div className="p-3">
+            <Button variant="outline" className="w-full" onClick={async () => {
+              await signOut();
+              setIsSheetOpen(false);
+            }}>
+              Sair
+            </Button>
+          </div>
+        </SheetContent>
+      </Sheet>
+    </>
   );
 };
 

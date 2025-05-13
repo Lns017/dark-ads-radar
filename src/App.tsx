@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -13,6 +12,8 @@ import Pixels from "./pages/Pixels";
 import PixelDetail from "./pages/PixelDetail";
 import Campaigns from "./pages/Campaigns";
 import ProtectedRoute from "@/components/ProtectedRoute";
+import FacebookIntegration from "./pages/FacebookIntegration";
+import FacebookSuccess from "./pages/FacebookSuccess";
 
 const queryClient = new QueryClient();
 
@@ -58,6 +59,8 @@ const App = () => (
                 </ProtectedRoute>
               } 
             />
+            <Route path="/facebook-integration" element={<ProtectedRoute><FacebookIntegration /></ProtectedRoute>} />
+            <Route path="/facebook-success" element={<FacebookSuccess />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </AuthProvider>

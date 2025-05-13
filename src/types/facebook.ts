@@ -15,6 +15,9 @@ export interface FacebookIntegration {
   connected_at: string;
   is_active: boolean;
   ad_accounts: AdAccount[];
+  // Adding these fields to make the type compatible with Supabase response
+  access_token: string;
+  token_expires_in?: number;
 }
 
 export interface SyncProgress {

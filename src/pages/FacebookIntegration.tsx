@@ -21,6 +21,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { FacebookIntegration, AdAccount, SyncProgress } from '@/types/facebook';
+import { Json } from '@/integrations/supabase/types';
 
 const FacebookIntegrationPage = () => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
@@ -60,7 +61,24 @@ const FacebookIntegrationPage = () => {
         .eq('user_id', user.id);
       
       if (error) throw error;
-      return data as FacebookIntegration[];
+      
+      // Transform the data to match our FacebookIntegration interface
+      return (data as any[]).map(item => {
+        // Ensure ad_accounts is properly typed as AdAccount[]
+        const adAccounts = Array.isArray(item.ad_accounts) 
+          ? item.ad_accounts.map((account: any) => ({
+              id: account.id,
+              name: account.name,
+              account_id: account.account_id,
+              business_name: account.business_name
+            }))
+          : [];
+          
+        return {
+          ...item,
+          ad_accounts: adAccounts
+        } as FacebookIntegration;
+      });
     },
     enabled: !!user
   });

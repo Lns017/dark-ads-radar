@@ -53,4 +53,3 @@ export interface FacebookPost {
   type: string;
   picture?: string;
 }
-

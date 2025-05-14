@@ -25,3 +25,32 @@ export interface SyncProgress {
   status: 'idle' | 'loading' | 'success' | 'error';
   message?: string;
 }
+
+// Facebook Page and Posts types
+export interface FacebookPage {
+  id: string;
+  name: string;
+  likes: number;
+  reach: number;
+  category: string;
+  picture?: string;
+}
+
+export interface PostMetrics {
+  likes: number;
+  comments: number;
+  shares: number;
+  reach?: number;
+  engagement?: number;
+}
+
+export interface FacebookPost {
+  id: string;
+  message?: string;
+  created_time: string;
+  permalink_url: string;
+  metrics: PostMetrics;
+  type: string;
+  picture?: string;
+}
+

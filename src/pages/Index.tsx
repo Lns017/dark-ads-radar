@@ -17,6 +17,7 @@ import {
   PieChart, 
   ShoppingCart 
 } from 'lucide-react';
+import FacebookDashboard from '@/components/facebook/FacebookDashboard';
 
 // Mock data for demonstration purposes
 const mockPerformanceData = [
@@ -234,6 +235,13 @@ const Dashboard = () => {
             </div>
           </div>
 
+          {/* Facebook Data Section */}
+          {(activeTab === 'all' || activeTab === 'facebook') && (
+            <div className="mb-6">
+              <FacebookDashboard />
+            </div>
+          )}
+
           {/* Platform Specific Sections */}
           {(activeTab === 'all' || activeTab === 'facebook') && (
             <div className="mb-6">
@@ -273,6 +281,7 @@ const Dashboard = () => {
             </div>
           )}
 
+          {/* Google Ads Section */}
           {(activeTab === 'all' || activeTab === 'google') && (
             <div className="mb-6">
               <h3 className="text-lg font-medium mb-4 flex items-center">

@@ -1,80 +1,19 @@
 
-import { useEffect, useState } from 'react';
-import { toast } from 'sonner';
-import { useNavigate } from 'react-router-dom';
-import FacebookApiStatus from '@/components/facebook/FacebookApiStatus';
+import { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { useAuth } from '@/contexts/AuthContext';
+import { toast } from '@/components/ui/use-toast';
+import FacebookConnectionStatus from '@/components/facebook/FacebookConnectionStatus';
 import FacebookPageSummary from '@/components/facebook/FacebookPageSummary';
 import RecentPostsList from '@/components/facebook/RecentPostsList';
 import EmptyStateConnect from '@/components/facebook/EmptyStateConnect';
-import { useQuery } from '@tanstack/react-query';
+import FacebookDashboardLoading from '@/components/facebook/FacebookDashboardLoading';
 import { supabase } from '@/integrations/supabase/client';
-import { useAuth } from '@/contexts/AuthContext';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { AlertTriangle } from 'lucide-react';
 
 const FacebookDashboard = () => {
   const { user } = useAuth();
-  const navigate = useNavigate();
   const [hasConnection, setHasConnection] = useState<boolean | null>(null);
   const [apiError, setApiError] = useState<string | null>(null);
-
-  // Check if we have an active Facebook integration
-  const { data: integration, isLoading } = useQuery({
-    queryKey: ['facebook-integration-status'],
-    queryFn: async () => {
-      if (!user) return null;
-      
-      const { data, error } = await supabase
-        .from('facebook_integrations')
-        .select('*')
-        .eq('user_id', user.id)
-        .eq('is_active', true)
-        .maybeSingle();
-      
-      if (error) {
-        console.error('Erro ao verificar integração:', error);
-        return null;
-      }
-      
-      return data;
-    },
-    enabled: !!user
-  });
-
-  // Check API connectivity
-  const { refetch: checkApiStatus } = useQuery({
-    queryKey: ['facebook-api-health'],
-    queryFn: async () => {
-      if (!user || !integration) return { status: 'offline' };
-      
-      try {
-        const { data: sessionData } = await supabase.auth.getSession();
-        if (!sessionData.session) {
-          throw new Error('Usuário não autenticado');
-        }
-        
-        const response = await fetch('/functions/v1/facebook-auth/check-status', {
-          method: 'GET',
-          headers: {
-            'Authorization': `Bearer ${sessionData.session.access_token}`
-          }
-        });
-        
-        if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(errorData.error || 'API não está respondendo corretamente');
-        }
-        
-        return { status: 'online' };
-      } catch (error: any) {
-        console.error('Erro ao verificar status da API:', error);
-        setApiError(error.message);
-        return { status: 'error', message: error.message };
-      }
-    },
-    enabled: false, // Don't run automatically
-    retry: false,
-  });
 
   // Start Facebook OAuth
   const startAuth = async () => {
@@ -107,23 +46,35 @@ const FacebookDashboard = () => {
     }
   };
 
-  useEffect(() => {
-    setHasConnection(!!integration);
-    
-    // Check API status if we have an integration
-    if (integration) {
-      checkApiStatus();
-    }
-  }, [integration, checkApiStatus]);
+  // Handle connection status changes from the FacebookConnectionStatus component
+  const handleConnectionChange = (
+    connectionStatus: boolean | null, 
+    connectionApiError: string | null
+  ) => {
+    setHasConnection(connectionStatus);
+    setApiError(connectionApiError);
+  };
+
+  // Check if we have an active Facebook integration (for loading state only)
+  const { isLoading } = useQuery({
+    queryKey: ['facebook-integration-check'],
+    queryFn: async () => {
+      if (!user) return null;
+      
+      const { data } = await supabase
+        .from('facebook_integrations')
+        .select('id')
+        .eq('user_id', user.id)
+        .eq('is_active', true)
+        .maybeSingle();
+      
+      return data;
+    },
+    enabled: !!user
+  });
 
   if (isLoading) {
-    return (
-      <div className="p-4">
-        <div className="h-24 flex items-center justify-center">
-          <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent"></div>
-        </div>
-      </div>
-    );
+    return <FacebookDashboardLoading />;
   }
 
   // If no connection, show connect state
@@ -134,27 +85,8 @@ const FacebookDashboard = () => {
   return (
     <div className="space-y-6">
       {/* Status and API health */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-4">
-        <h2 className="text-xl font-semibold">Facebook Insights</h2>
-        <FacebookApiStatus />
-      </div>
+      <FacebookConnectionStatus onConnectionChange={handleConnectionChange} />
       
-      {/* API Error alert */}
-      {apiError && (
-        <Alert variant="destructive" className="mb-4">
-          <AlertTriangle className="h-4 w-4 mr-2" />
-          <AlertDescription>
-            Erro na API do Facebook: {apiError}. 
-            <button 
-              onClick={() => navigate('/facebook-integration')} 
-              className="ml-2 underline"
-            >
-              Verifique sua conexão
-            </button>
-          </AlertDescription>
-        </Alert>
-      )}
-
       {/* Dashboard content */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="md:col-span-1">

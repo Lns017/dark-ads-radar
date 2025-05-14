@@ -1,3 +1,4 @@
+
 import * as React from "react"
 
 import type {
@@ -166,6 +167,40 @@ function toast({ ...props }: Toast) {
     dismiss,
     update,
   }
+}
+
+// Add helper functions for different toast types
+toast.error = (message: string, options = {}) => {
+  return toast({
+    variant: "destructive",
+    title: "Error",
+    description: message,
+    ...options,
+  })
+}
+
+toast.success = (message: string, options = {}) => {
+  return toast({
+    title: "Success",
+    description: message,
+    ...options,
+  })
+}
+
+toast.warning = (message: string, options = {}) => {
+  return toast({
+    title: "Warning",
+    description: message,
+    ...options,
+  })
+}
+
+toast.info = (message: string, options = {}) => {
+  return toast({
+    title: "Info",
+    description: message,
+    ...options,
+  })
 }
 
 function useToast() {

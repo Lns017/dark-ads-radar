@@ -1,7 +1,7 @@
 
 import { useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { toast } from 'sonner';
+import { toast } from '@/components/ui/use-toast';
 import { Check, AlertCircle } from 'lucide-react';
 
 const FacebookSuccess = () => {
@@ -12,6 +12,15 @@ const FacebookSuccess = () => {
     const searchParams = new URLSearchParams(location.search);
     const status = searchParams.get('status');
     const message = searchParams.get('message');
+    
+    // Show toast based on status
+    if (status === 'success') {
+      toast.success('Conta do Facebook conectada com sucesso!');
+    } else if (status === 'error' && message) {
+      toast.error(`Erro na conexão: ${message}`);
+    } else if (status === 'error') {
+      toast.error('Não foi possível conectar sua conta do Facebook.');
+    }
     
     // Redirecionar automaticamente após alguns segundos
     const timer = setTimeout(() => {

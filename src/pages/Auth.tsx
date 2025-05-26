@@ -82,38 +82,45 @@ const Auth = () => {
     setIsDemoLoading(true);
     
     try {
-      // Create a demo account with timestamp to ensure uniqueness
-      const timestamp = Date.now();
-      const demoEmail = `demo${timestamp}@pixeltrack.demo`;
+      // Use a predefined demo account
+      const demoEmail = 'demo@pixeltrack.com';
       const demoPassword = 'demo123456';
       
-      // First try to sign up the demo user
-      const { error: signUpError, data } = await supabase.auth.signUp({
+      console.log('Tentando fazer login com conta demo:', demoEmail);
+      
+      // Try to sign in first
+      const { error: signInError, data: signInData } = await supabase.auth.signInWithPassword({
         email: demoEmail,
         password: demoPassword,
-        options: {
-          emailRedirectTo: window.location.origin,
-          data: {
-            email_confirm_method: 'auto_confirm'
-          }
-        },
+      });
+      
+      if (!signInError) {
+        console.log('Login demo realizado com sucesso');
+        toast.success('Login demo realizado com sucesso!');
+        navigate('/');
+        return;
+      }
+      
+      console.log('Conta demo não existe, criando nova conta:', signInError.message);
+      
+      // If sign in fails, try to create the demo account
+      const { error: signUpError, data: signUpData } = await supabase.auth.signUp({
+        email: demoEmail,
+        password: demoPassword,
       });
       
       if (signUpError) {
-        // If signup fails, try to login (user might already exist)
-        const { error: signInError } = await supabase.auth.signInWithPassword({
-          email: demoEmail,
-          password: demoPassword,
-        });
-        
-        if (signInError) throw signInError;
+        console.error('Erro ao criar conta demo:', signUpError);
+        throw signUpError;
       }
       
+      console.log('Conta demo criada com sucesso');
       toast.success('Conta demo criada e logada com sucesso!');
       navigate('/');
+      
     } catch (error: any) {
-      console.error('Erro ao criar conta demo:', error);
-      toast.error('Erro ao criar conta demo. Tente novamente.');
+      console.error('Erro ao processar conta demo:', error);
+      toast.error('Erro ao acessar conta demo. Tente novamente.');
     } finally {
       setIsDemoLoading(false);
     }
@@ -160,7 +167,7 @@ const Auth = () => {
             {isDemoLoading ? (
               <span className="flex items-center">
                 <div className="animate-spin rounded-full h-4 w-4 border-2 border-white/30 border-t-white mr-2"></div>
-                Criando conta demo...
+                Processando conta demo...
               </span>
             ) : (
               <span className="flex items-center">

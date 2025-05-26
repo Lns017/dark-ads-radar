@@ -9,7 +9,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
-import { ArrowRight, LogIn } from 'lucide-react';
+import { ArrowRight, LogIn, Sparkles } from 'lucide-react';
 
 const authSchema = z.object({
   email: z.string().email('Email inválido'),
@@ -78,26 +78,59 @@ const Auth = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background p-4">
-      <div className="w-full max-w-md">
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold">PixelTrack</h1>
-          <p className="text-muted-foreground mt-2">
-            {authMode === 'login' ? 'Faça login para acessar seu dashboard' : 'Crie sua conta para começar'}
+    <div className="min-h-screen relative flex items-center justify-center p-4 overflow-hidden">
+      {/* Animated Background */}
+      <div className="absolute inset-0 bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900">
+        <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%239C92AC" fill-opacity="0.1"%3E%3Ccircle cx="30" cy="30" r="2"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')] opacity-20"></div>
+        
+        {/* Floating orbs */}
+        <div className="absolute top-20 left-20 w-72 h-72 bg-purple-500/30 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute bottom-20 right-20 w-96 h-96 bg-blue-500/20 rounded-full blur-3xl animate-pulse delay-1000"></div>
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-indigo-500/20 rounded-full blur-3xl animate-pulse delay-2000"></div>
+      </div>
+
+      <div className="relative z-10 w-full max-w-md">
+        {/* Logo/Header Section */}
+        <div className="text-center mb-8 animate-fade-in">
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-purple-500 to-blue-500 rounded-2xl mb-4 shadow-2xl">
+            <Sparkles className="w-8 h-8 text-white" />
+          </div>
+          <h1 className="text-4xl font-bold bg-gradient-to-r from-white to-gray-200 bg-clip-text text-transparent mb-2">
+            PixelTrack
+          </h1>
+          <p className="text-gray-300">
+            {authMode === 'login' ? 'Bem-vindo de volta' : 'Comece sua jornada'}
           </p>
         </div>
 
-        <div className="bg-card p-6 rounded-lg shadow-lg border border-border">
+        {/* Glass Card */}
+        <div className="backdrop-blur-xl bg-white/10 border border-white/20 rounded-2xl p-8 shadow-2xl animate-scale-in">
+          <div className="mb-6">
+            <h2 className="text-2xl font-semibold text-white mb-2">
+              {authMode === 'login' ? 'Entrar' : 'Criar Conta'}
+            </h2>
+            <p className="text-gray-300 text-sm">
+              {authMode === 'login' 
+                ? 'Acesse seu dashboard de analytics' 
+                : 'Monitore seus pixels em tempo real'
+              }
+            </p>
+          </div>
+
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(handleAuth)} className="space-y-4">
+            <form onSubmit={form.handleSubmit(handleAuth)} className="space-y-6">
               <FormField
                 control={form.control}
                 name="email"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Email</FormLabel>
+                    <FormLabel className="text-gray-200">Email</FormLabel>
                     <FormControl>
-                      <Input placeholder="seu@email.com" {...field} />
+                      <Input 
+                        placeholder="seu@email.com" 
+                        className="backdrop-blur-sm bg-white/10 border-white/20 text-white placeholder:text-gray-400 focus:bg-white/20 transition-all duration-300" 
+                        {...field} 
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -109,20 +142,29 @@ const Auth = () => {
                 name="password"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Senha</FormLabel>
+                    <FormLabel className="text-gray-200">Senha</FormLabel>
                     <FormControl>
-                      <Input type="password" placeholder="••••••" {...field} />
+                      <Input 
+                        type="password" 
+                        placeholder="••••••••" 
+                        className="backdrop-blur-sm bg-white/10 border-white/20 text-white placeholder:text-gray-400 focus:bg-white/20 transition-all duration-300" 
+                        {...field} 
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
 
-              <Button type="submit" className="w-full" disabled={isLoading}>
+              <Button 
+                type="submit" 
+                className="w-full bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-white border-0 h-12 text-base font-medium shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02]" 
+                disabled={isLoading}
+              >
                 {isLoading ? (
                   <span className="flex items-center">
-                    <span className="animate-spin mr-2">◌</span>
-                    Aguarde...
+                    <div className="animate-spin rounded-full h-4 w-4 border-2 border-white/30 border-t-white mr-2"></div>
+                    Processando...
                   </span>
                 ) : (
                   <span className="flex items-center">
@@ -143,16 +185,37 @@ const Auth = () => {
             </form>
           </Form>
 
-          <div className="mt-4 text-center">
+          <div className="mt-6 pt-6 border-t border-white/10">
             <button
               onClick={() => setAuthMode(authMode === 'login' ? 'signup' : 'login')}
-              className="text-primary text-sm hover:underline"
+              className="w-full text-center text-gray-300 text-sm hover:text-white transition-colors duration-300 group"
             >
               {authMode === 'login'
-                ? 'Não tem uma conta? Cadastre-se'
-                : 'Já possui uma conta? Entre'}
+                ? (
+                  <>
+                    Não tem uma conta? 
+                    <span className="text-purple-300 ml-1 group-hover:text-purple-200">
+                      Cadastre-se
+                    </span>
+                  </>
+                )
+                : (
+                  <>
+                    Já possui uma conta? 
+                    <span className="text-purple-300 ml-1 group-hover:text-purple-200">
+                      Entre
+                    </span>
+                  </>
+                )}
             </button>
           </div>
+        </div>
+
+        {/* Footer */}
+        <div className="text-center mt-8">
+          <p className="text-gray-400 text-xs">
+            Protegido por criptografia de ponta a ponta
+          </p>
         </div>
       </div>
     </div>

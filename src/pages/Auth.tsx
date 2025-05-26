@@ -9,7 +9,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
-import { ArrowRight, LogIn, Sparkles } from 'lucide-react';
+import { ArrowRight, LogIn, Sparkles, Play } from 'lucide-react';
 
 const authSchema = z.object({
   email: z.string().email('Email inválido'),
@@ -22,6 +22,7 @@ const Auth = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [isLoading, setIsLoading] = useState(false);
+  const [isDemoLoading, setIsDemoLoading] = useState(false);
   const [authMode, setAuthMode] = useState<'login' | 'signup'>('login');
   
   const form = useForm<AuthFormValues>({
@@ -77,13 +78,57 @@ const Auth = () => {
     }
   };
 
+  const handleDemoLogin = async () => {
+    setIsDemoLoading(true);
+    
+    try {
+      // Create a demo account with timestamp to ensure uniqueness
+      const timestamp = Date.now();
+      const demoEmail = `demo${timestamp}@pixeltrack.demo`;
+      const demoPassword = 'demo123456';
+      
+      // First try to sign up the demo user
+      const { error: signUpError, data } = await supabase.auth.signUp({
+        email: demoEmail,
+        password: demoPassword,
+        options: {
+          emailRedirectTo: window.location.origin,
+          data: {
+            email_confirm_method: 'auto_confirm'
+          }
+        },
+      });
+      
+      if (signUpError) {
+        // If signup fails, try to login (user might already exist)
+        const { error: signInError } = await supabase.auth.signInWithPassword({
+          email: demoEmail,
+          password: demoPassword,
+        });
+        
+        if (signInError) throw signInError;
+      }
+      
+      toast.success('Conta demo criada e logada com sucesso!');
+      navigate('/');
+    } catch (error: any) {
+      console.error('Erro ao criar conta demo:', error);
+      toast.error('Erro ao criar conta demo. Tente novamente.');
+    } finally {
+      setIsDemoLoading(false);
+    }
+  };
+
   return (
     <div className="min-h-screen relative flex items-center justify-center p-4 overflow-hidden">
       {/* Animated Background */}
       <div className="absolute inset-0 bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900">
-        <div className="absolute inset-0 opacity-20" style={{
-          backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%239C92AC' fill-opacity='0.1'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`
-        }}></div>
+        <div 
+          className="absolute inset-0 opacity-20"
+          style={{
+            backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%239C92AC' fill-opacity='0.1'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`
+          }}
+        ></div>
         
         {/* Floating orbs */}
         <div className="absolute top-20 left-20 w-72 h-72 bg-purple-500/30 rounded-full blur-3xl animate-pulse"></div>
@@ -103,6 +148,40 @@ const Auth = () => {
           <p className="text-gray-300">
             {authMode === 'login' ? 'Bem-vindo de volta' : 'Comece sua jornada'}
           </p>
+        </div>
+
+        {/* Demo Button */}
+        <div className="mb-6">
+          <Button 
+            onClick={handleDemoLogin}
+            className="w-full bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white border-0 h-12 text-base font-medium shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02]" 
+            disabled={isDemoLoading || isLoading}
+          >
+            {isDemoLoading ? (
+              <span className="flex items-center">
+                <div className="animate-spin rounded-full h-4 w-4 border-2 border-white/30 border-t-white mr-2"></div>
+                Criando conta demo...
+              </span>
+            ) : (
+              <span className="flex items-center">
+                <Play className="mr-2 h-4 w-4" />
+                Testar com Conta Demo
+              </span>
+            )}
+          </Button>
+          <p className="text-center text-gray-400 text-xs mt-2">
+            Acesso instantâneo sem cadastro
+          </p>
+        </div>
+
+        {/* Divider */}
+        <div className="relative mb-6">
+          <div className="absolute inset-0 flex items-center">
+            <div className="w-full border-t border-white/20"></div>
+          </div>
+          <div className="relative flex justify-center text-sm">
+            <span className="px-2 bg-transparent text-gray-300">ou</span>
+          </div>
         </div>
 
         {/* Glass Card */}

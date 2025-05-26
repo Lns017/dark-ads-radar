@@ -9,7 +9,161 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      campanhas: {
+        Row: {
+          conversoes: number | null
+          custo_por_conversao: number | null
+          data: string | null
+          facebook_account_id: string | null
+          facebook_budget: string | null
+          facebook_objective: string | null
+          facebook_status: string | null
+          id: string
+          investimento: number | null
+          nome_campanha: string
+          pixel_id: string
+        }
+        Insert: {
+          conversoes?: number | null
+          custo_por_conversao?: number | null
+          data?: string | null
+          facebook_account_id?: string | null
+          facebook_budget?: string | null
+          facebook_objective?: string | null
+          facebook_status?: string | null
+          id?: string
+          investimento?: number | null
+          nome_campanha: string
+          pixel_id: string
+        }
+        Update: {
+          conversoes?: number | null
+          custo_por_conversao?: number | null
+          data?: string | null
+          facebook_account_id?: string | null
+          facebook_budget?: string | null
+          facebook_objective?: string | null
+          facebook_status?: string | null
+          id?: string
+          investimento?: number | null
+          nome_campanha?: string
+          pixel_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "campanhas_pixel_id_fkey"
+            columns: ["pixel_id"]
+            isOneToOne: false
+            referencedRelation: "pixels"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      facebook_auth_states: {
+        Row: {
+          created_at: string | null
+          expires_at: string | null
+          id: string
+          state: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          expires_at?: string | null
+          id?: string
+          state: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          expires_at?: string | null
+          id?: string
+          state?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      facebook_integrations: {
+        Row: {
+          access_token: string
+          ad_accounts: Json | null
+          connected_at: string | null
+          facebook_user_email: string | null
+          facebook_user_id: string
+          facebook_user_name: string | null
+          id: string
+          is_active: boolean | null
+          token_expires_in: number | null
+          user_id: string
+        }
+        Insert: {
+          access_token: string
+          ad_accounts?: Json | null
+          connected_at?: string | null
+          facebook_user_email?: string | null
+          facebook_user_id: string
+          facebook_user_name?: string | null
+          id?: string
+          is_active?: boolean | null
+          token_expires_in?: number | null
+          user_id: string
+        }
+        Update: {
+          access_token?: string
+          ad_accounts?: Json | null
+          connected_at?: string | null
+          facebook_user_email?: string | null
+          facebook_user_id?: string
+          facebook_user_name?: string | null
+          id?: string
+          is_active?: boolean | null
+          token_expires_in?: number | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      pixels: {
+        Row: {
+          criado_em: string | null
+          eventos_capturados: Json | null
+          facebook_account_id: string | null
+          facebook_creation_time: string | null
+          facebook_last_fired_time: string | null
+          id: string
+          nome_pixel: string
+          plataforma: string
+          source: string | null
+          status: string
+          user_id: string
+        }
+        Insert: {
+          criado_em?: string | null
+          eventos_capturados?: Json | null
+          facebook_account_id?: string | null
+          facebook_creation_time?: string | null
+          facebook_last_fired_time?: string | null
+          id?: string
+          nome_pixel: string
+          plataforma: string
+          source?: string | null
+          status: string
+          user_id: string
+        }
+        Update: {
+          criado_em?: string | null
+          eventos_capturados?: Json | null
+          facebook_account_id?: string | null
+          facebook_creation_time?: string | null
+          facebook_last_fired_time?: string | null
+          id?: string
+          nome_pixel?: string
+          plataforma?: string
+          source?: string | null
+          status?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

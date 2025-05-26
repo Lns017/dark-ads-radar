@@ -131,19 +131,18 @@ const EmailVerification = () => {
                     <FormControl>
                       <InputOTP
                         maxLength={6}
-                        {...field}
-                        render={({ slots }) => (
-                          <InputOTPGroup className="gap-2 justify-center">
-                            {slots.map((slot, index) => (
-                              <InputOTPSlot
-                                key={index}
-                                index={index}
-                                className="w-12 h-12 text-lg"
-                              />
-                            ))}
-                          </InputOTPGroup>
-                        )}
-                      />
+                        value={field.value}
+                        onChange={field.onChange}
+                      >
+                        <InputOTPGroup className="gap-2 justify-center">
+                          <InputOTPSlot index={0} className="w-12 h-12 text-lg" />
+                          <InputOTPSlot index={1} className="w-12 h-12 text-lg" />
+                          <InputOTPSlot index={2} className="w-12 h-12 text-lg" />
+                          <InputOTPSlot index={3} className="w-12 h-12 text-lg" />
+                          <InputOTPSlot index={4} className="w-12 h-12 text-lg" />
+                          <InputOTPSlot index={5} className="w-12 h-12 text-lg" />
+                        </InputOTPGroup>
+                      </InputOTP>
                     </FormControl>
                     <FormMessage className="text-center" />
                   </FormItem>
